@@ -1,4 +1,4 @@
-"""Usefule performance metric
+"""Useful performance metric
 """
 
 # Author: Xiaolu Xiong <beardeer@gmail.com>

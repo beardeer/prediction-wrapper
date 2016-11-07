@@ -55,6 +55,5 @@ class ModelWrapper(object):
         Raises
         ------
         NotImplementedError
-            Description
         """
         raise NotImplementedError()
