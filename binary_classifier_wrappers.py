@@ -5,9 +5,11 @@ import pandas as pd
 
 from model_wrapper import ModelWrapper
 
+pd.options.mode.chained_assignment = None
+
 class KfoldBinaryClassifierWrapper(ModelWrapper):
 
-    def __init__(self, data_frame, feature_names, label_name, categorical_feature_names = None, k = 5):
+    def __init__(self, data_frame, feature_names, label_name, categorical_feature_names = [], k = 5):
         ModelWrapper.__init__(self, data_frame, feature_names, label_name, categorical_feature_names)
 
         self.cv = None
@@ -30,7 +32,7 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
             self.data_frame[name] = le.fit_transform(self.data_frame[name])
 
     def _onehot_categorical_featurs(self, train_data, test_data):
-        if self.categorical_feature_names == None:
+        if self.categorical_feature_names == []:
             return train_data, test_data
 
         feature_idxs = [self.data_frame.columns.get_loc(name) for name in self.categorical_feature_names]
@@ -44,6 +46,7 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
     def run(self):
 
         results = pd.DataFrame(index = [i for i in range(len(self.data_frame))], columns = ['label', 'pred_prob', 'pred_label'])
+        results.is_copy = False
         self._transform_categorical_featurs()
 
         for train_idx, test_idx in self.cv.split(self.data_frame):
@@ -55,9 +58,9 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
             y_pred_p = self.model.predict_proba(x_test)[:, 1]
             y_pred_l = self.model.predict(x_test)
 
-            results['label'].iloc[test_idx] = y_test
-            results['pred_prob'].iloc[test_idx] = y_pred_p
-            results['pred_label'].iloc[test_idx] = y_pred_l
+            results['label'].ix[test_idx] = y_test
+            results['pred_prob'].ix[test_idx] = y_pred_p
+            results['pred_label'].ix[test_idx] = y_pred_l
 
         return results
 
