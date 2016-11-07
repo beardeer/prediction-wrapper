@@ -6,10 +6,9 @@
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 import numpy as np
-import pandas as pd
 
-from .model_wrapper import ModelWrapper
-from .pred_results import BinaryPredResult
+from model_wrapper import ModelWrapper
+from pred_results import BinaryPredResults
 
 class KfoldBinaryClassifierWrapper(ModelWrapper):
     """The class runs k-fold cross-validation on a sklearn classifier model.
@@ -21,9 +20,10 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
     kfold : sklearn KFold
         K-Folds cross-validator for a given k
     """
-    def __init__(self, data_frame, label_name, feature_names, 
-    	categorical_feature_names = [], k = 5):
-        ModelWrapper.__init__(self, data_frame, label_name, feature_names, categorical_feature_names)
+    def __init__(self, data_frame, label_name, feature_names,\
+        categorical_feature_names, k=5):
+        ModelWrapper.__init__(self, data_frame, \
+            label_name, feature_names, categorical_feature_names)
 
         self.k = k
         self._kfold = None
@@ -36,10 +36,10 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
         -------
         None
         """
-        self._kfold = KFold(n_splits = self.k, shuffle = True)
+        self._kfold = KFold(n_splits=self.k, shuffle=True)
 
     def _split_data(self, train_idx, test_idx):
-        """Split the data_frame by training index and testing index. 
+        """Split the data_frame by training index and testing index.
 
         Parameters
         ----------
@@ -53,35 +53,35 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
         DataFrames
             DataFrames that used in current fold of cross validation
         """
-        x_train = (self.data_frame[self.feature_names].iloc[train_idx,:])
+        x_train = (self.data_frame[self.feature_names].iloc[train_idx, :])
         y_train = self.data_frame[self.label_name].iloc[train_idx]
-        x_test = (self.data_frame[self.feature_names].iloc[test_idx,:])
+        x_test = (self.data_frame[self.feature_names].iloc[test_idx, :])
         y_test = self.data_frame[self.label_name].iloc[test_idx]
         return x_train, y_train, x_test, y_test
 
     def _transform_categorical_featurs(self):
         """Utilize the sklearn LabelEncoder to encode categorical features.
 
-        This is necessary for using categorical values that are represented in strings. 
+        This is necessary for using categorical values that are represented in strings.
 
         Returns
         -------
         None
         """
-        le = LabelEncoder()
+        encoder = LabelEncoder()
         # Transform each categorical feature with value between 0 and n_classes-1
         for name in self.categorical_feature_names:
-            self.data_frame[name] = le.fit_transform(self.data_frame[name])
+            self.data_frame[name] = encoder.fit_transform(self.data_frame[name])
 
     def _onehot_categorical_featurs(self, train_data, test_data):
         """Utilize the sklearn OneHotEncoder to encode categorical features.
 
         In order to feed categorical features to sklearn model, we need to convert
-        them to one-hot encoding. 
+        them to one-hot encoding.
 
         There are other different ways of using categorical features, such as using
         pandas.get_dummies, but get_dummies will create additional features in
-        data_frame, which I perfer not to that.  
+        data_frame, which I perfer not to that.
 
         Parameters
         ----------
@@ -98,8 +98,9 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
         if self.categorical_feature_names == []:
             return train_data, test_data
         # Select indexs of categorical features, and encode, then transform them
-        feature_idxs = [self.data_frame.columns.get_loc(name) for name in self.categorical_feature_names]
-        encoder = OneHotEncoder(categorical_features = feature_idxs)
+        feature_idxs = [self.data_frame.columns.get_loc(name) for name in \
+        self.categorical_feature_names]
+        encoder = OneHotEncoder(categorical_features=feature_idxs)
         # Need to fit on every values from both training and testing
         encoder.fit(np.vstack((train_data, test_data)))
         train_data = encoder.transform(train_data)
@@ -135,6 +136,3 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
             results.set_col(y_pred_l, 'pred_label', test_idx)
 
         return results
-
-
-

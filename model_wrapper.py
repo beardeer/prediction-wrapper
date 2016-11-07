@@ -8,7 +8,7 @@ The abstrct class for builidng prediction model wrappers
 from abc import ABCMeta, abstractmethod
 
 class ModelWrapper(object):
-    """The abstrct class for builidng prediction model wrappers. 
+    """The abstrct class for builidng prediction model wrappers.
 
     Attributes
     ----------
@@ -25,8 +25,8 @@ class ModelWrapper(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, data_frame, label_name, 
-        feature_names, categorical_feature_names = []):
+    def __init__(self, data_frame, label_name, \
+        feature_names, categorical_feature_names):
 
         self.data_frame = data_frame
         self.label_name = label_name
@@ -58,5 +58,3 @@ class ModelWrapper(object):
             Description
         """
         raise NotImplementedError()
-        
-

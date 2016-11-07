@@ -9,7 +9,7 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 
 class PredResults(object):
-    """Base class to store prediction results. 
+    """Base class to store prediction results.
 
     Attributes
     ----------
@@ -17,7 +17,7 @@ class PredResults(object):
         DataFrame that used to store data
     """
     def __init__(self, index_len, columns):
-        self.results = pd.DataFrame(index = range(index_len), columns = columns)
+        self.results = pd.DataFrame(index=range(index_len), columns=columns)
 
     def set_col(self, data, col_name, idx):
         """Set DataFrame column values by column name and indexes
@@ -41,11 +41,11 @@ class PredResults(object):
 
 class BinaryPredResults(PredResults):
     """An implementation to store binary prediction results.
-    
+
     It contains the labels, the predicted probabilities, predicted labels.
     """
     def  __init__(self, index_len):
-        PredResult.__init__(self, index_len, ['label', 'pred_prob', 'pred_label'])
+        PredResults.__init__(self, index_len, ['label', 'pred_prob', 'pred_label'])
 
     @property
     def label(self):
@@ -79,4 +79,3 @@ class BinaryPredResults(PredResults):
             The stored probability labels
         """
         return self.results['pred_label']
-
