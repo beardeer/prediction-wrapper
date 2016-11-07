@@ -4,20 +4,21 @@ import numpy as np
 import pandas as pd
 
 from model_wrapper import ModelWrapper
+from pred_results import BinaryPredResult
 
 pd.options.mode.chained_assignment = None
 
 class KfoldBinaryClassifierWrapper(ModelWrapper):
 
-    def __init__(self, data_frame, feature_names, label_name, categorical_feature_names = [], k = 5):
-        ModelWrapper.__init__(self, data_frame, feature_names, label_name, categorical_feature_names)
+    def __init__(self, data_frame, label_name, feature_names, categorical_feature_names = [], k = 5):
+        ModelWrapper.__init__(self, data_frame, label_name, feature_names, categorical_feature_names)
 
-        self.cv = None
         self.k = k
+        self.kfold = None
         self._generate_split_index()
 
     def _generate_split_index(self):
-        self.cv = KFold(n_splits = self.k, shuffle = True)
+        self.kfold = KFold(n_splits = self.k, shuffle = True)
 
     def _split_data(self, train_idx, test_idx):
         x_train = (self.data_frame[self.feature_names].iloc[train_idx,:])
@@ -45,11 +46,10 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
 
     def run(self):
 
-        results = pd.DataFrame(index = [i for i in range(len(self.data_frame))], columns = ['label', 'pred_prob', 'pred_label'])
-        results.is_copy = False
+        result = BinaryPredResult(len(self.data_frame))
         self._transform_categorical_featurs()
 
-        for train_idx, test_idx in self.cv.split(self.data_frame):
+        for train_idx, test_idx in self.kfold.split(self.data_frame):
             x_train, y_train, x_test, y_test = self._split_data(train_idx, test_idx)
             x_train, x_test = self._onehot_categorical_featurs(x_train, x_test)
 
@@ -58,11 +58,11 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
             y_pred_p = self.model.predict_proba(x_test)[:, 1]
             y_pred_l = self.model.predict(x_test)
 
-            results['label'].ix[test_idx] = y_test
-            results['pred_prob'].ix[test_idx] = y_pred_p
-            results['pred_label'].ix[test_idx] = y_pred_l
+            result.set_col(y_test, 'label', test_idx)
+            result.set_col(y_pred_p, 'pred_prob', test_idx)
+            result.set_col(y_pred_l, 'pred_label', test_idx)
 
-        return results
+        return result
 
 
 
