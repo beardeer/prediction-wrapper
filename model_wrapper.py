@@ -14,7 +14,7 @@ class ModelWrapper(object):
     ----------
     categorical_feature_names : list
         A list contains categorical feature names, these names must appear in feature_name
-    data_frame : pandas DataFrame
+    data_frame : pandas.DataFrame
         The input data for building models
     feature_names : list
         A list of input feature names, these names must appear in data_frame's column names

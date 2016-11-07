@@ -1,93 +1,82 @@
-"""Summary
+"""'Container' classes to store prediction results for easy access
 """
+
+# Author: Xiaolu Xiong <beardeer@gmail.com>
+
 import pandas as pd
 
+# Disalbe DataFrame overwriting warning
 pd.options.mode.chained_assignment = None
 
-class PredResult(object):
-    """Summary
+class PredResults(object):
+    """Base class to store prediction results. 
 
     Attributes
     ----------
-    result : TYPE
-        Description
+    results : DataFrame
+        DataFrame that used to store data
     """
     def __init__(self, index_len, columns):
-        """Summary
-
-        Parameters
-        ----------
-        index_len : TYPE
-            Description
-        columns : TYPE
-            Description
-        """
-        self.result = pd.DataFrame(index = range(index_len), columns = columns)
+        self.results = pd.DataFrame(index = range(index_len), columns = columns)
 
     def set_col(self, data, col_name, idx):
-        """Summary
+        """Set DataFrame column values by column name and indexes
 
         Parameters
         ----------
-        data : TYPE
-            Description
-        col_name : TYPE
-            Description
-        idx : TYPE
-            Description
+        data : array
+            Input data
+        col_name : str
+            A column name in the results DataFrame
+        idx : list
+            A list of indexes of value locations
 
         Returns
         -------
-        TYPE
-            Description
+        None
         """
-        self.result[col_name].ix[idx] = data
+        self.results[col_name].ix[idx] = data
 
 
 
-class BinaryPredResult(PredResult):
-    """Summary
+class BinaryPredResults(PredResults):
+    """An implementation to store binary prediction results.
+    
+    It contains the labels, the predicted probabilities, predicted labels.
     """
     def  __init__(self, index_len):
-        """Summary
-
-        Parameters
-        ----------
-        index_len : TYPE
-            Description
-        """
         PredResult.__init__(self, index_len, ['label', 'pred_prob', 'pred_label'])
 
     @property
     def label(self):
-        """Summary
+        """Get the 'label' array
 
         Returns
         -------
-        TYPE
-            Description
+        pandas.Series
+            The stored labels
         """
-        return self.result['label']
+        return self.results['label']
 
     @property
     def pred_prob(self):
-        """Summary
+        """Get the predicted probability values
 
         Returns
         -------
-        TYPE
-            Description
+        pandas.Series
+            The stored probability values
         """
-        return self.result['pred_prob']
+        return self.results['pred_prob']
 
     @property
     def pred_label(self):
-        """Summary
+        """Get the predicted probability labels
 
         Returns
         -------
-        TYPE
-            Description
+        pandas.Series
+            The stored probability labels
         """
-        return self.result['pred_label']
+        return self.results['pred_label']
 

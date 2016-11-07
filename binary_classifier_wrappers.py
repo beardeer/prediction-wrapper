@@ -93,7 +93,7 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
         Returns
         -------
         numpy matrix
-            two numpy matrices with one-hot encoded features
+            Two numpy matrices with one-hot encoded features
         """
         if self.categorical_feature_names == []:
             return train_data, test_data
@@ -113,9 +113,9 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
         Returns
         -------
         PredResult
-            Model-generated Prediction result
+            Model-generated Prediction results
         """
-        result = BinaryPredResult(len(self.data_frame))
+        results = BinaryPredResults(len(self.data_frame))
         self._transform_categorical_featurs()
 
         # Run k-fold cross-validation
@@ -130,11 +130,11 @@ class KfoldBinaryClassifierWrapper(ModelWrapper):
             y_pred_p = self.model.predict_proba(x_test)[:, 1]
             y_pred_l = self.model.predict(x_test)
 
-            result.set_col(y_test, 'label', test_idx)
-            result.set_col(y_pred_p, 'pred_prob', test_idx)
-            result.set_col(y_pred_l, 'pred_label', test_idx)
+            results.set_col(y_test, 'label', test_idx)
+            results.set_col(y_pred_p, 'pred_prob', test_idx)
+            results.set_col(y_pred_l, 'pred_label', test_idx)
 
-        return result
+        return results
 
 
 
